@@ -19,13 +19,13 @@ const PlaybackScreen = () => {
     listenForServerData();
   }, []);
 
-  // 📌 서버에서 txt 데이터를 받으면 자동 실행 (요청 X, 서버가 보낼 때만)
+  // 서버에서 데이터를 받으면 자동 실행 (요청 X, 서버가 보낼 때만)
   const listenForServerData = async () => {
     try {
       setStatus('서버 데이터 대기 중...');
 
-      // 서버에서 텍스트 파일 수신 (예시 API)
-      const response = await fetch('http://your-server.com/get-text');
+      // 서버에서 파일 수신
+      const response = await fetch('http://test.server/testfile.txt');
       const data = await response.json();
 
       if (data.text) {
@@ -39,7 +39,7 @@ const PlaybackScreen = () => {
     }
   };
 
-  // 📌 Google Cloud TTS 호출 → MP4 변환 → 자동 재생
+  //Google Cloud TTS
   const requestTTSData = async (text: string) => {
     setStatus(`Google TTS 요청 중: "${text}"`);
     const base64Audio = await fetchTTS(text);
@@ -52,7 +52,7 @@ const PlaybackScreen = () => {
     }
   };
 
-  // 📌 녹음 기능 유지
+  //
   const startRecording = async () => {
     if (recording) {
       setStatus('녹음 중지... 변환 중...');
@@ -84,17 +84,17 @@ const PlaybackScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>재생화면</Text>
 
-      {/* 🔹 상태 표시 UI (어두운 배경, 잘 보이는 글씨) */}
+      {/*상태 표시 UI (어두운 배경, 잘 보이는 글씨) */}
       <View style={styles.statusBox}>
         <Text style={styles.statusText}>{status}</Text>
       </View>
 
-      {/* 🔹 서버에서 받은 txt 데이터 표시 */}
+      {/* 서버에서 받은 txt 데이터 표시 */}
       {textData && (
         <Text style={styles.textDisplay}>서버 데이터: "{textData}"</Text>
       )}
 
-      {/* 🔹 Google Cloud TTS 변환된 MP4 자동 재생 */}
+      {/* Google Cloud TTS 변환된 MP4 자동 재생 */}
       {mp4Data && (
         <Video
           source={{ uri: `data:audio/mp4;base64,${mp4Data}` }}
@@ -104,12 +104,12 @@ const PlaybackScreen = () => {
         />
       )}
 
-      {/* 🔹 녹음 버튼 */}
+      {/* 녹음 버튼 */}
       <TouchableOpacity style={styles.button} onPress={startRecording}>
         <Text style={styles.buttonText}>{recording ? '녹음 중지' : '녹음 시작'}</Text>
       </TouchableOpacity>
 
-      {/* 🔹 Google STT 변환된 텍스트 표시 */}
+      {/* Google STT 변환된 텍스트 표시 */}
       <Text style={styles.transcription}>{transcription}</Text>
     </View>
   );
