@@ -1,43 +1,21 @@
-export const fetchSurveyData = async (): Promise<Array<{ id: number; question: string }>> => {
-  try {
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/YOUR_SPREADSHEET_ID_HERE/values/Sheet1!A:B?key=YOUR_API_KEY_HERE`
-    );
-    const json = await response.json();
-    // 첫 번째 행이 헤더라고 가정 후 나머지 행을 데이터로 변환
-    const rows = json.values;
-    const data = rows.slice(1).map((row: string[]) => ({
-      id: Number(row[0]),
-      question: row[1],
-    }));
-    return data;
-  } catch (error) {
-    console.error("Sheets API error:", error);
-    throw error;
-  }
-};
+// sheetsApi.ts
+export const fetchSurveyData = async (): Promise<string[]> => {
+  // 실제 스프레드시트 ID, 범위, 인증 정보(API 키 또는 Bearer 토큰)를 입력하세요.
+  const SPREADSHEET_ID = 'your-spreadsheet-id';
+  const RANGE = 'Sheet1!A1:A'; // 예: A열에 설문 문항이 위치
+  const API_KEY = '%REACT_APP_GOOGLE_CLOUD_API_KEY%';
 
-export const updateSheetResponse = async (responseText: string): Promise<boolean> => {
-  try {
-    // 현재 시각과 응답 텍스트를 함께 기록 (필요에 따라 다른 형식으로 기록 가능)
-    const timestamp = new Date().toISOString();
-    const values = [[timestamp, responseText]];
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/YOUR_SPREADSHEET_ID_HERE/values/Sheet1!A:B:append?valueInputOption=USER_ENTERED&key=%EACT_APP_GOOGLE_CLOUD_API_KEY%`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ values }),
-      }
-    );
-    const json = await response.json();
-    if (json.updates) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (error) {
-    console.error('Sheets update error:', error);
-    return false;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Sheets API error: ${response.statusText}`);
   }
+  const data = await response.json();
+  // 응답 구조에 따라 데이터를 가공 (values: string[][])
+  if (data.values && data.values.length > 0) {
+    // 각 행의 첫 번째 셀을 추출하여 배열로 반환
+    return data.values.map((row: string[]) => row[0]);
+  }
+  return [];
 };

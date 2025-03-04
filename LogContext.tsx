@@ -1,30 +1,31 @@
+// LogContext.tsx
 import React, { createContext, useState } from 'react';
 
-interface LogContextProps {
+interface LogContextType {
   logs: string[];
   addLog: (log: string) => void;
-  resetLogs: () => void;
+  clearLogs: () => void;
 }
 
-export const LogContext = createContext<LogContextProps>({
+export const LogContext = createContext<LogContextType>({
   logs: [],
   addLog: () => {},
-  resetLogs: () => {},
+  clearLogs: () => {},
 });
 
 export const LogProvider: React.FC = ({ children }) => {
   const [logs, setLogs] = useState<string[]>([]);
 
   const addLog = (log: string) => {
-    setLogs((prevLogs) => [...prevLogs, log]);
+    setLogs(prevLogs => [log, ...prevLogs]);
   };
 
-  const resetLogs = () => {
+  const clearLogs = () => {
     setLogs([]);
   };
 
   return (
-    <LogContext.Provider value={{ logs, addLog, resetLogs }}>
+    <LogContext.Provider value={{ logs, addLog, clearLogs }}>
       {children}
     </LogContext.Provider>
   );
